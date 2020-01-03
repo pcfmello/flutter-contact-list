@@ -1,12 +1,48 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
+final String contactTable = "contactTable";
 final String idColumn = "idColumn";
 final String nameColumn = "nameColumn";
 final String emailColumn = "emailColumn";
 final String phoneColumn = "phoneColumn";
 final String imgColumn = "imgColumn";
 
-class ContactHelper {}
+// Classe que usa o padrão Singleton
+// https://www.youtube.com/watch?v=BBywfIrmd5M*/
+
+class ContactHelper {
+  static final ContactHelper _instance = ContactHelper.internal();
+
+  factory ContactHelper() => _instance;
+
+  ContactHelper.internal();
+
+  Database _db;
+
+  Future<Database> get db async => _db != null ? _db : await initDb();
+
+  Future<Database> initDb() async {
+    // Obtém o caminho para a pasta que armazena os bancos de dados
+    final databasesPath = await getDatabasesPath();
+
+    // Junta o caminho com o nome do banco de dados
+    final path = join(databasesPath, "contacts.db");
+
+    // Abrir o banco de dados | onCreate cria o banco de dados na primeira vez que é acessado
+    return await openDatabase(path, version: 1, onCreate: (Database db, int newerVersion) async {
+      await db.execute(
+          "CREATE TABLE $contactTable ("
+              "$idColumn INTEGER PRIMARY KEY,"
+              "$nameColumn TEXT,"
+              "$emailColumn TEXT,"
+              "$phoneColumn TEXT,"
+              "$imgColumn TEXT"
+              ")");
+    });
+
+  }
+}
 
 class Contact {
   int id;
