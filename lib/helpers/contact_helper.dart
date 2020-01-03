@@ -30,17 +30,33 @@ class ContactHelper {
     final path = join(databasesPath, "contacts.db");
 
     // Abrir o banco de dados | onCreate cria o banco de dados na primeira vez que é acessado
-    return await openDatabase(path, version: 1, onCreate: (Database db, int newerVersion) async {
-      await db.execute(
-          "CREATE TABLE $contactTable ("
-              "$idColumn INTEGER PRIMARY KEY,"
-              "$nameColumn TEXT,"
-              "$emailColumn TEXT,"
-              "$phoneColumn TEXT,"
-              "$imgColumn TEXT"
-              ")");
+    return await openDatabase(path, version: 1,
+        onCreate: (Database db, int newerVersion) async {
+      await db.execute("CREATE TABLE $contactTable ("
+          "$idColumn INTEGER PRIMARY KEY,"
+          "$nameColumn TEXT,"
+          "$emailColumn TEXT,"
+          "$phoneColumn TEXT,"
+          "$imgColumn TEXT");
     });
+  }
 
+  Future<Contact> saveContact(Contact contact) async {
+    // Obtém o DB
+    Database dbContact = await db;
+    contact.id = await dbContact.insert(contactTable, contact.toMap());
+    return contact;
+  }
+
+  Future<Contact> getContact(int id) async {
+    Database dbContact = await db;
+    
+    List<Map> maps = await dbContact.query(contactTable,
+        columns: [idColumn, nameColumn, emailColumn, phoneColumn, imgColumn],
+        where: "$idColumn = ?",
+        whereArgs: [id]);
+
+    return maps.isEmpty ? null : Contact.fromMap(maps.first);
   }
 }
 
