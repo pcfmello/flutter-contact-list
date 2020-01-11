@@ -27,7 +27,7 @@ class ContactHelper {
     final databasesPath = await getDatabasesPath();
 
     // Junta o caminho com o nome do banco de dados
-    final path = join(databasesPath, "contacts.db");
+    final path = join(databasesPath, "contactsnew.db");
 
     // Abrir o banco de dados | onCreate cria o banco de dados na primeira vez que é acessado
     return await openDatabase(path, version: 1,
@@ -37,7 +37,7 @@ class ContactHelper {
           "$nameColumn TEXT,"
           "$emailColumn TEXT,"
           "$phoneColumn TEXT,"
-          "$imgColumn TEXT");
+          "$imgColumn TEXT)");
     });
   }
 
@@ -100,6 +100,8 @@ class Contact {
   String email;
   String phone;
   String img;
+
+  Contact();
 
   Contact.fromMap(Map map) {
     id = map[idColumn];
